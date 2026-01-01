@@ -6,6 +6,7 @@ dsgfdfgdfg
  <string if="hello" any="ff"  id="origin_country"   iother="dfdff">Made in {0} under < an hour
 
 and does support multi line
+
 </string> 
 fg
 fgdfgdfgdfg
@@ -42,9 +43,10 @@ const getStringResource = (id, content) => {
                     }
                 }
                 if (headFound) {
+                    let paraFoundFinal = false;
                     for (let t = headStart; content[t] !== '>'; t++) {
+                        let paraFound = true;
                         if (content[t] === 'i') {
-                            let paraFound = true;
                             for (let j = 0; j < paraPat.length; j++) {
                                 headStart = t + j + 1;
                                 if (content[t + j] !== paraPat[j]) {
@@ -56,9 +58,13 @@ const getStringResource = (id, content) => {
                                 while (content[headStart - 1] !== '>') {
                                     headStart++;
                                 }
+                                paraFoundFinal = true;
                                 break;
                             }
                         }
+                    }
+                    if (!paraFoundFinal) {
+                        headFound = false;
                     }
                 }
             } else if (!tailFound) {
@@ -94,6 +100,6 @@ const getPSVR = (id, values) => {
     return populateStringVariables(value, values);
 };
 
-console.log(
-    getPSVR('origin_country', ['India'])
-)
+console.log(`"${getPSVR('origin_country', ['India'])}"`)
+
+console.log(`"${getPSVR('hello', [])}"`)
