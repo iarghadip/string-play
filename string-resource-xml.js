@@ -3,7 +3,7 @@
 content = `
 <string>Hello</string>
 dsgfdfgdfg
- <string id="origin_country">Made in {0} under < an hour
+ <string if="hello" any="ff"  id="origin_country"   iother="dfdff">Made in {0} under < an hour
 
 and does support multi line
 </string> 
@@ -19,11 +19,11 @@ f
 // this is not an actual xml parser
 // i just wrote the logic as i was bored
 // it does not support xml element hirearchy
-// but it does not break on xml syntax error
-// TODO: ignore multiple spaces before id arg
+// but it ignores invalid xml lines
 
 const getStringResource = (id, content) => {
-    const headPat = `<string id="${id}">`;
+    const headPat = '<string ';
+    const paraPat = `id="${id}"`;
     const tailPat = '</string>';
     let headFound = false;
     let tailFound = false;
@@ -39,6 +39,26 @@ const getStringResource = (id, content) => {
                     if (content[i + j] !== headPat[j]) {
                         headFound = false;
                         break;
+                    }
+                }
+                if (headFound) {
+                    for (let t = headStart; content[t] !== '>'; t++) {
+                        if (content[t] === 'i') {
+                            let paraFound = true;
+                            for (let j = 0; j < paraPat.length; j++) {
+                                headStart = t + j + 1;
+                                if (content[t + j] !== paraPat[j]) {
+                                    paraFound = false;
+                                    break;
+                                }
+                            }
+                            if (paraFound) {
+                                while (content[headStart - 1] !== '>') {
+                                    headStart++;
+                                }
+                                break;
+                            }
+                        }
                     }
                 }
             } else if (!tailFound) {
