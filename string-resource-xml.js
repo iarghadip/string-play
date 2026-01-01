@@ -1,93 +1,50 @@
 // imagine this content is taken from a file io read
 
 content = `
-<!-- Dummy strings.xml parser test file -->
-<string id="app_name">My Awesome App</string>
+random header noise !!! ### $$$
+<!-- fake strings.xml playground -->
 
-dsgfdfgdfg invalid text here
+<string id="app_title">Garbage App</string>
+unrelated text 123 abc xyz
+<string id="login_text">Login</string> #### ####
 
-<string if="user_logged_in" any="ff" id="welcome_message" readonly priority="high">Welcome back, {0}! You have {1} new notifications.
+<string idx="wrong_attr">Should be ignored</string>
+<string id="welcome_user">Welcome, {0}</string>
 
-This spans multiple lines
-and includes <special> chars & entities.
+@@@@ random symbols &&& %%^^
+<string id="dup">First</string>
+<string id="dup">Second</string>
+
+<string>no id at all</string>
+<invalidTag id="x">broken</invalidTag>
+
+<string id="multiline_test">
+Line one
+Line two with junk $$$
+Line three <notatag> & stuff
 </string>
 
-fgdfgdfgdfg
-filler text
+trailing trash trailing trash trailing trash
+<string id="footer_ok">Footer OK</string>
 
-            <string id="hello">Simple Hello</string>
+final noise final noise
+<string 9id="broken_footer">© Broken Footer</string>
+garbage garbage garbage garbage
 
-<string id="hello">Hello Duplicate 1</string>
-<string id="hello">Hello Duplicate 2</string>
+// commented out but still text
+// <string id="ghost">Ghost</string>
 
 
 
-<string>Hello</string> <!-- no id, ignore -->
+end junk end junk end junk
+<string 2id="foot2er">© 2027 All Rights Reserved</string>
+more garbage more garbage more <string id="hello">Hello {0} - {0} is good {PERSON_NAME}</string> garbage
 
-<bogus>Invalid tag, parser should skip</bogus>
+this line belongs to {PERSON_NAME}
 
-<string id="error_title" type="error" visible="false">Error Occurred</string>
-<string id="error_message">Something went wrong: {0}. Please try again later.
 
-Details:
-- Network issue
-- Server down
-- {1} timeout
-</string>
+`;
 
-more garbage dfgdfgdfgdfgdfg
-
-  <string id="button_ok">OK</string>
-<string id="button_cancel" disabled>Cancel</string>
-<string id="button_save" class="primary">Save Changes</string>
-
-<string id="user_profile">
-Name: {0}
-Email: {1}
-Country: {2}
-Bio:
-{3}
-</string>
-
-fillerfillerfiller
-
-<string id="settings_title">App Settings</string>
-<string id="theme_dark">Dark Mode</string>
-<string id="theme_light">Light Mode</string>
-<string id="language_en">English</string>
-<string id="language_hi">हिंदी</string>
-
-<!-- nested lookalike but invalid -->
-<string id="menu_home">
-Home
-<sub>Sub item</sub> <!-- ignore sub -->
-More text here
-</string>
-
-dfgdfgdfgdfgdfgdfgdfgdfgdfg
-
-<string id="long_text" multiline="true">This is a very long string resource that spans many lines for testing multiline extraction.
-
-Line 1: Normal text
-Line 2: With numbers 12345
-Line 3: Special chars !@#$%^&*()
-Line 4: Unicode: café naïve naïve
-Line 5: Empty-ish line
-
-Line 6: Ends here.
-</string>
-
-// <!--string id="hello_4">Hello 4 with extra space   </string>
-
-<string id="hello_24">This works</string>
-
-final <string id="footer">© 2026 All Rights Reserved</string>
-
-trailing garbage garbage garbage 
-
-<string id="hello_4">But if i remove the above and only keep this it does not work???</string>
-
-`
 
 // this is my strings.xml parser
 // this is not an actual xml parser
@@ -158,7 +115,8 @@ const getStringResource = (id, content) => {
                         break;
                     }
                 }
-            } else {
+            }
+            if (headFound && tailFound) {
                 for (let j = headStart; j < tailStart; j++) {
                     loop_count++;
                     result = result ? result + content[j] : content[j];
@@ -171,13 +129,17 @@ const getStringResource = (id, content) => {
 };
 
 const populateStringVariables = (string, values) => {
-    values.forEach((v, i) => {
-        string = string.replace(new RegExp(`\\{${i}\\}`), v);
-    });
+    for (const key in values) {
+        string = string.replace(
+            new RegExp(`\\{${key}\\}`, 'g'),
+            values[key]
+        );
+    }
     return string;
 };
 
 const getPSVR = (id, values) => {
+//  const value = content;
     const value = getStringResource(id, content);
     //console.log(value)
     return populateStringVariables(value, values);
@@ -187,4 +149,6 @@ const getPSVR = (id, values) => {
 
 //console.log(`"${getPSVR('hello', [])}"`)
 //
-console.log(`"${getPSVR('hello_4', [])}"`, loop_count)
+console.log(`"${getPSVR('hello', [2026])}"`, loop_count)
+
+console.log(`"${getPSVR('hello', { 0: 2026, PERSON_NAME: 'Arghadip' })}"`, loop_count)
